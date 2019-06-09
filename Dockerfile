@@ -1,4 +1,4 @@
-FROM python:3.6-alpine as application
+FROM python:3.6-slim as application
 ENV LC_ALL C.UTF-8
 ENV LaND C.UTF-8
 
