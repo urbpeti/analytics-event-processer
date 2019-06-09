@@ -11,6 +11,7 @@ pylint = "*"
 flask = "*"
 gunicorn = "*"
 flask-cors = "*"
+flask-testing = "*"
 
 [requires]
 python_version = "3.6"
