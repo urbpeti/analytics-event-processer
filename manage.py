@@ -8,10 +8,10 @@ manager = Manager(app)
 
 def createEventTableSchema():
     _create_dynamodb_table(
-        TableName='AnaliticEvents',
+        TableName='AnalyticEvents',
         KeySchema=[
             {
-                'AttributeName': 'id',
+                'AttributeName': 'uid',
                 'KeyType': 'HASH'  # Partition key
             },
             {
@@ -21,7 +21,7 @@ def createEventTableSchema():
         ],
         AttributeDefinitions=[
             {
-                'AttributeName': 'id',
+                'AttributeName': 'uid',
                 'AttributeType': 'N'
             },
             {
