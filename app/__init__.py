@@ -1,10 +1,29 @@
+from app.views.event import EventView
+from app.repositories.event import EventRepository
 import os
 import boto3
 
 from flask import Flask
 from flask_cors import CORS
 
-from app.views.baseview import BaseView
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 
 app = Flask(__name__)
 CORS(app)
@@ -24,4 +43,6 @@ dynamodb = boto3.resource(
     aws_session_token=''
 )
 
-app.add_url_rule('/base', view_func=BaseView.as_view('base'))
+app.add_url_rule(
+    '/events', view_func=EventView.as_view('events', event_repository=EventRepository(dynamodb))
+)
