@@ -5,6 +5,7 @@ services:
     restart: always
     depends_on:
       - localstack
+      - localstack-test
     ports:
       - "8000:8000"
     volumes:
@@ -32,6 +33,16 @@ services:
       - HOSTNAME=analytics-event-processer-localstack
     ports:
       - "4569:4569"
+    networks:
+      analytics-event-processer-network:
+
+  localstack-test:
+    image: localstack/localstack:latest
+    container_name: analytics-event-processer-localstack-test
+    environment:
+      - SERVICES=dynamodb:4569
+      - DEFAULT_REGION=eu-central-1
+      - HOSTNAME=analytics-event-processer-localstack-test
     networks:
       analytics-event-processer-network:
 

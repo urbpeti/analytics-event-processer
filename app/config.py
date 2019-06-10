@@ -22,7 +22,7 @@ class TestingConfig(BaseConfig):
     REGION = 'eu-central-1'
     AWS_ACCESS_KEY = 'dummy'
     AWS_SECRET_KEY = 'dummy'
-    DYNAMODB_ENDPOINT = 'http://localstack:4569'
+    DYNAMODB_ENDPOINT = 'http://localstack-test:4569'
 
 
 class ProductionConfig(BaseConfig):
