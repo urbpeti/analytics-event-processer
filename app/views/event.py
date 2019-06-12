@@ -10,13 +10,14 @@ from datetime import datetime
 
 
 class EventView(MethodView):
-    def __init__(self, event_repository):
+    def __init__(self, event_repository, uploader):
         self._event_repository = event_repository
+        self._uploader = uploader
 
     @jwt_required
     def post(self):
         current_user = get_jwt_identity()
-        self._handle_post(current_user)
+        return self._handle_post(current_user)
 
     def _handle_post(self, current_user):
         try:
@@ -28,10 +29,13 @@ class EventView(MethodView):
                 'EventView post user_id: ' + str(current_user)
             )
 
-            item = self._event_repository.put_event(json_data)
+            self._event_repository.put_event(json_data)
             current_app.logger.info('EventView event stored in db')
 
-            return make_response(json.dumps(item, indent=4, cls=DecimalEncoder), 200)
+            self._uploader.upload(json_data)
+            current_app.logger.info('EventView upload events')
+
+            return make_response('Event processed', 200)
 
         except ClientError as e:
             current_app.logger.error(e.response['Error']['Message'])

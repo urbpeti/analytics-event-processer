@@ -5,6 +5,7 @@ services:
     restart: always
     depends_on:
       - localstack
+      - mocked-analytics
       - localstack-test
     ports:
       - "8000:8000"
@@ -43,6 +44,14 @@ services:
       - SERVICES=dynamodb:4569
       - DEFAULT_REGION=eu-central-1
       - HOSTNAME=analytics-event-processer-localstack-test
+    networks:
+      analytics-event-processer-network:
+  mocked-analytics:
+    image: hashicorp/http-echo
+    container_name: mocked-analytics
+    command:
+      - "-text"
+      - "hello"
     networks:
       analytics-event-processer-network:
 

@@ -2,6 +2,9 @@ from logging.config import dictConfig
 from app.views.event import EventView
 from app.repositories.event import EventRepository
 from app.views.auth import GetTokenView
+
+from app.lib.analytic_uploader import AnalyticUploader, SimpleHTTPHandler
+
 import os
 import boto3
 
@@ -47,8 +50,14 @@ dynamodb = boto3.resource(
 
 jwt = JWTManager(app)
 
+
+uploader = AnalyticUploader([
+    SimpleHTTPHandler(
+        'app/analytic_configs/simple.conf', 'http://mocked-analytics:5678'
+    )
+])
 app.add_url_rule(
-    '/events', view_func=EventView.as_view('events', event_repository=EventRepository(dynamodb))
+    '/events', view_func=EventView.as_view('events', event_repository=EventRepository(dynamodb), uploader=uploader)
 )
 app.add_url_rule(
     '/getapikey', view_func=GetTokenView.as_view('getapikey')

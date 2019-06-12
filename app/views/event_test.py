@@ -15,7 +15,8 @@ class EventViewTest(BaseTestCase):
         self._request_mock = self._patch_lib('app.views.event.request')
 
         self._event_repository = MagicMock()
-        self._event_view = EventView(self._event_repository)
+        self._uploader = MagicMock()
+        self._event_view = EventView(self._event_repository, self._uploader)
 
     @patch('app.views.event.json')
     def test_post_should_store_event_with_timestamp(self, json_mock, *_):
@@ -43,8 +44,24 @@ class EventViewTest(BaseTestCase):
         self._event_view._handle_post(1)
 
         make_response_mock.assert_called_once_with(
-            '{\n    "uid": 1,\n    "timestamp": 123\n}', 200
+            'Event processed', 200
         )
+
+    @patch('app.views.event.json')
+    def test_post_should_call_uploader_with_the_event(self, json_mock, _):
+        self._mock_timestamp(123.2)
+        self._mock_post_body({
+            'event_type': 'play_sound'
+        })
+        json_mock.dumps.return_value = '{}'
+
+        self._event_view._handle_post(1)
+
+        self._uploader.upload.assert_called_once_with({
+            'uid': 1,
+            'timestamp': 123,
+            'event_type': 'play_sound'
+        })
 
     def test_post_should_return_internal_server_error_when_repositry_throw_exception(self, make_response_mock):
         self._mock_timestamp(123.0)
