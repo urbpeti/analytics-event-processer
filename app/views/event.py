@@ -3,7 +3,6 @@ from flask import request, make_response, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.lib.encoders import DecimalEncoder
-from app.lib.auth import Auth
 from botocore.exceptions import ClientError
 
 import json
