@@ -16,6 +16,8 @@ flask-testing = "*"
 boto3 = "*"
 flask-script = "*"
 urllib3 = "*"
+pyjwt = "*"
+flask-jwt-extended = "*"
 
 [requires]
 python_version = "3.6"

@@ -1,12 +1,14 @@
+from logging.config import dictConfig
 from app.views.event import EventView
 from app.repositories.event import EventRepository
+from app.views.auth import GetTokenView
 import os
 import boto3
 
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
-from logging.config import dictConfig
 
 dictConfig({
     'version': 1,
@@ -43,6 +45,11 @@ dynamodb = boto3.resource(
     aws_session_token=''
 )
 
+jwt = JWTManager(app)
+
 app.add_url_rule(
     '/events', view_func=EventView.as_view('events', event_repository=EventRepository(dynamodb))
+)
+app.add_url_rule(
+    '/getapikey', view_func=GetTokenView.as_view('getapikey')
 )

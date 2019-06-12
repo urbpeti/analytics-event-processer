@@ -1,6 +1,8 @@
 from test.base import BaseTestCase
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+from flask_jwt_extended import create_access_token
+from flask import current_app
 import decimal
 
 
@@ -11,23 +13,23 @@ from app.views.event import EventView
 class EventViewTest(BaseTestCase):
     def setUp(self):
         self._request_mock = self._patch_lib('app.views.event.request')
+
         self._event_repository = MagicMock()
         self._event_view = EventView(self._event_repository)
 
     @patch('app.views.event.json')
-    def test_post_should_store_event_with_timestamp(self, json_mock, _):
-        self._mock_timestamp(123.0)
+    def test_post_should_store_event_with_timestamp(self, json_mock, *_):
+        self._mock_timestamp(123.2)
         self._mock_post_body({
-            'uid': 1,
             'event_type': 'play_sound'
         })
         json_mock.dumps.return_value = '{}'
 
-        self._event_view.post()
+        self._event_view._handle_post(1)
 
         self._event_repository.put_event.assert_called_once_with({
             'uid': 1,
-            'timestamp': 123.0,
+            'timestamp': 123,
             'event_type': 'play_sound'
         })
 
@@ -35,10 +37,10 @@ class EventViewTest(BaseTestCase):
         self._mock_timestamp(123.0)
         self._event_repository.put_event.return_value = {
             'uid': decimal.Decimal(1),
-            'timestamp': decimal.Decimal(123.0)
+            'timestamp': decimal.Decimal(123)
         }
 
-        self._event_view.post()
+        self._event_view._handle_post(1)
 
         make_response_mock.assert_called_once_with(
             '{\n    "uid": 1,\n    "timestamp": 123\n}', 200
@@ -50,7 +52,7 @@ class EventViewTest(BaseTestCase):
             error_response={"Error": {"Message": ''}}, operation_name='insert'
         )
 
-        self._event_view.post()
+        self._event_view._handle_post(1)
 
         make_response_mock.assert_called_once_with(
             'Error occured', 500
